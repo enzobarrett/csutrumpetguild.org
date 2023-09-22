@@ -3,8 +3,8 @@
         <div style="background-image:url({{ include.image_uri }});" class="hashdump-card-image"></div>
         <div style="padding:10px" class="background-foreground hashdump-card">
             <h4>{{ include.meeting_data.title }}</h4>
-            <h4><b>{{ include.meeting_data.location }}</b></h4>
             <h5><span class="">5:30 PM on {{ include.meeting_data.date }}</span></h5>
+            <h5><span class="">{{ include.meeting_data.location }}</span></h5>
             <p>{{ include.meeting_data.summary }}</p>
             {% for link in include.meeting_data.links %}
                 <a href={{ link.url }} target="_blank">{{ link.name }}</a><br>
