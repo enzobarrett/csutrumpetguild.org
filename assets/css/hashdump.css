@@ -141,3 +141,7 @@ h5 {
     background: #000;
     display: none;
 }
+
+.location {
+    color: #212427 !important;
+}
