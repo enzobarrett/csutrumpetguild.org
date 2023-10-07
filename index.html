@@ -22,9 +22,9 @@ permalink: /
 		{% else %}
 			<div class="col-md-12 w3-padding-16 w3-round w3-border w3-margin-bottom">
 		{% endif %}
-		
+
 		{% if news.image %}
-			<img src="/assets/images/{{ news.image }}" class="w3-margin-right" style="height:70px; float:left;"> 
+			<img src="/assets/images/{{ news.image }}" class="w3-margin-right" style="height:70px; float:left;">
 		{% endif %}
 		{{ news.content }}
 	</div>
@@ -35,53 +35,67 @@ permalink: /
 	<h2>Upcoming Meetings</h2>
 	<hr/>
 </div>
-		
+
+{% assign i = 0 %}
 <div class="col-md-12">
-{% for meeting in site.data.meetings.meetings %}
-	{% assign uri = 'assets/images/' | append: meeting.picture %}
-	{% include meeting_card.html meeting_data=meeting image_uri=uri %}
-{% endfor %}
-<div class="clearfix"></div>
+	{% for meeting in site.data.meetings.meetings reversed%}
+	{% assign uri = '/assets/images/' | append: meeting.picture %}
+	{% assign i = i | plus: 1 %}
+	{% include meeting_card.html meeting_data=meeting image_uri=uri%}
+	{% if i == 3 %}
+	<div class="clearfix"></div>
+	{% assign i = 0 %}
+	{% endif %}
+	{% endfor %}
 </div>
 
 {% include footer.html %}
 
 <script>
-$(function() {
-	lowest = 0;
-		today = new Date();
-	for (var fd of $('[future-date]')){
-		meetDate = new Date($(fd).attr('future-date'));
-		meetDate.setHours(19);
-		meetDate.setMinutes(0);
-		if ( meetDate >= today){
-			if (meetDate < lowest || lowest === 0){
-				lowest = meetDate;
+	$(function() {
+		lowest = 0;
+		for (var fd of $('[future-date]')){
+			meetDate = new Date($(fd).attr('future-date'));
+			meetDate.setHours(19);
+			meetDate.setMinutes(0);
+			today = new Date();
+			if ( meetDate >= today){
+				if (meetDate < lowest || lowest === 0){
+					lowest = meetDate;
+				}
 			}
 		}
-	}
-	var execptions = 2;
-	for (var fd of $('[future-date]')){
-		meetDate = new Date($(fd).attr('future-date'));
-		meetDate.setHours(19);
-		meetDate.setMinutes(0);
-		if ( meetDate.getTime() !== new Date(lowest).getTime()){
-			if (meetDate.getTime() > today && execptions > 0){
-				execptions = execptions - 1;
-			}else{
-				$(fd).remove();
-			}
-		}
-		/*
-		else{
-			$(fd).find('h5>span').addClass('w3-tag w3-round background-red');
-		}
-		*/
-	}
-});
+		for (var fd of $('[future-date]')){
+			meetDate = new Date($(fd).attr('future-date'));
+			meetDate.setHours(19);
+			meetDate.setMinutes(0);
+			if ( meetDate.getTime() === new Date(lowest).getTime()){
+				// $(fd).find('h5>span').addClass('w3-tag w3-round background-red');
 
-// For the modal notes popup
-$(function() {
-	$('a[rel*=leanModal]').leanModal({ top : 200, closeButton: ".modal_close" });		
-});
+				// If we detect an upcoming meeting, we need to visually split the
+				// meetings page into upcoming and previous meetings.
+				$(fd).after('<h2 class="p-3"> Previous Meetings: </h2>');
+				$(fd).after('<hr/>');
+				$(fd).after('<div class="w-100"/>');
+				$(fd).after('<div class="clearfix"></div>');
+				//$(fd).before('<h2 class="p-3" display="block"> Upcoming Meetings: </h2>');
+
+				// When this happens, every `div.clearfix' needs to be pushed
+				// forward by one element, since the upcoming meeting
+				// was pulled out of the flow.
+				for (var clearfix of $('div.col-md-12 > div.clearfix')) {
+					$(clearfix).insertAfter($(clearfix).next());
+				}
+
+				$('html, body').animate({
+					scrollTop: $(fd).offset().top - 100
+				},1000);
+			}
+		}
+	});
+
+	$(function() {
+		$('a[rel*=leanModal]').leanModal({ top : 200, closeButton: ".modal_close" });
+	});
+
 </script>
